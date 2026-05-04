@@ -1202,9 +1202,10 @@ function checkPassword() {
   }
 }
 
-document.getElementById('password-overlay').addEventListener('click', function(e) {
-  if (e.target === this) closePasswordPrompt();
-});
+// Click outside disabled on password overlay too
+// document.getElementById('password-overlay').addEventListener('click', function(e) {
+//   if (e.target === this) closePasswordPrompt();
+// });
 
 function openEdit() {
   document.getElementById('e-school-name').value = data.schoolName || '';
@@ -1217,9 +1218,10 @@ function closeEdit() {
   document.getElementById('edit-overlay').classList.remove('open');
 }
 
-document.getElementById('edit-overlay').addEventListener('click', function(e) {
-  if (e.target === this) closeEdit();
-});
+// Click outside disabled — prevents accidental close while dragging
+// document.getElementById('edit-overlay').addEventListener('click', function(e) {
+//   if (e.target === this) closeEdit();
+// });
 
 function renderEditLists() {
   // Events
