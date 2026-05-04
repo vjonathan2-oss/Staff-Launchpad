@@ -884,14 +884,13 @@ const CONTENT = {
 // ✋ STOP EDITING HERE — do not change anything below this line
 // =============================================================================
 
-// ── JSONBIN STORAGE ───────────────────────────────────────────────────────────
-// Data is saved to JSONbin.io so ALL staff see the same content instantly.
-// The bin is created automatically on first save.
-const JSONBIN_API_KEY = '$2a$10$REj/xE6IO2CiGnReFDEKve3e2lOgIJK4G6POUdaBWGUtpw3GeNll6';
-const JSONBIN_BIN_KEY = 'launchpad_bin_id_v2'; // v2 = fresh bin for new API key
+// ── DATA STORAGE ─────────────────────────────────────────────────────────────
+// The page loads live data from data.json in the same GitHub repository.
+// To update content: use the padlock editor, copy the generated data.json,
+// and commit it to GitHub alongside index.html.
+// Falls back to the CONTENT defaults if data.json is not found.
 
 let data = JSON.parse(JSON.stringify(CONTENT));
-let binId = localStorage.getItem(JSONBIN_BIN_KEY) || null;
 
 function showLoadingOverlay(msg) {
   let el = document.getElementById('loading-overlay');
@@ -912,19 +911,11 @@ function hideLoadingOverlay() {
 }
 
 async function loadData() {
-  if (!binId) {
-    // No bin yet — use default CONTENT
-    data = JSON.parse(JSON.stringify(CONTENT));
-    return;
-  }
   try {
-    showLoadingOverlay('Loading launchpad data...');
-    const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
-      headers: { 'X-Master-Key': JSONBIN_API_KEY }
-    });
+    showLoadingOverlay('Loading launchpad...');
+    const res = await fetch('data.json?v=' + Date.now());
     if (res.ok) {
-      const json = await res.json();
-      data = json.record;
+      data = await res.json();
     } else {
       data = JSON.parse(JSON.stringify(CONTENT));
     }
@@ -935,40 +926,55 @@ async function loadData() {
   }
 }
 
-async function saveData(d) {
-  try {
-    showLoadingOverlay('Saving changes...');
-    if (!binId) {
-      // Create a new bin
-      const res = await fetch('https://api.jsonbin.io/v3/b', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Master-Key': JSONBIN_API_KEY,
-          'X-Bin-Name': 'Staff Launchpad',
-          'X-Bin-Private': 'true'
-        },
-        body: JSON.stringify(d)
-      });
-      if (res.ok) {
-        const json = await res.json();
-        binId = json.metadata.id;
-        localStorage.setItem(JSONBIN_BIN_KEY, binId);
-      }
-    } else {
-      // Update existing bin
-      await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Master-Key': JSONBIN_API_KEY
-        },
-        body: JSON.stringify(d)
-      });
-    }
-  } finally {
-    hideLoadingOverlay();
+function saveData(d) {
+  // Generate data.json content and show copy panel
+  const json = JSON.stringify(d, null, 2);
+  showDataJsonPanel(json);
+}
+
+function showDataJsonPanel(json) {
+  let panel = document.getElementById('datajson-overlay');
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.id = 'datajson-overlay';
+    panel.style.cssText = 'position:fixed;inset:0;background:rgba(26,39,68,0.6);z-index:999;display:flex;align-items:center;justify-content:center;padding:2rem;';
+    panel.innerHTML = `
+      <div style="background:white;border-radius:16px;width:100%;max-width:600px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+        <div style="padding:1.25rem 1.5rem;border-bottom:1px solid #e2ddd6;display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-family:Fraunces,serif;font-size:1.1rem;font-weight:500;color:#1a2744;">&#128190; Save to GitHub</span>
+          <button onclick="document.getElementById('datajson-overlay').remove()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:#718096;">&#215;</button>
+        </div>
+        <div style="padding:1.25rem 1.5rem;overflow-y:auto;flex:1;">
+          <p style="font-size:0.85rem;color:#4a5568;line-height:1.6;margin-bottom:1rem;">Your changes are ready. Follow these steps to make them live for all staff:</p>
+          <ol style="font-size:0.83rem;color:#4a5568;line-height:2;padding-left:1.25rem;margin-bottom:1.25rem;">
+            <li>Click <strong>Copy to clipboard</strong> below</li>
+            <li>Go to your <a href="https://github.com/vjonathan2-oss/Staff-Launchpad" target="_blank" style="color:#1a2744;font-weight:500;">GitHub repository &#8599;</a></li>
+            <li>Click <strong>Add file → Create new file</strong></li>
+            <li>Name the file exactly: <code style="background:#f0f0f0;padding:1px 5px;border-radius:3px;">data.json</code></li>
+            <li>Paste the copied content into the editor</li>
+            <li>Click <strong>Commit changes</strong></li>
+            <li>Wait 60 seconds, then refresh the launchpad</li>
+          </ol>
+          <button id="copy-json-btn" onclick="copyDataJson()" style="background:#1a2744;color:white;border:none;padding:0.6rem 1.25rem;border-radius:8px;font-family:DM Sans,sans-serif;font-size:0.85rem;font-weight:500;cursor:pointer;width:100%;margin-bottom:0.75rem;">&#128203; Copy to clipboard</button>
+          <textarea id="datajson-content" readonly style="width:100%;height:120px;font-family:monospace;font-size:0.72rem;border:1px solid #e2ddd6;border-radius:6px;padding:0.5rem;color:#4a5568;resize:none;background:#faf8f4;"></textarea>
+        </div>
+      </div>`;
+    document.body.appendChild(panel);
   }
+  document.getElementById('datajson-content').value = json;
+}
+
+function copyDataJson() {
+  const text = document.getElementById('datajson-content').value;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copy-json-btn');
+    btn.textContent = '✓ Copied!';
+    btn.style.background = '#27664a';
+    setTimeout(() => {
+      btn.textContent = '📋 Copy to clipboard';
+      btn.style.background = '#1a2744';
+    }, 2500);
+  });
 }
 
 // ── CLOCK ─────────────────────────────────────────────────────────────────────
@@ -1313,20 +1319,20 @@ function addNotice() {
 
 function removeNotice(i) { data.notices.splice(i,1); renderEditLists(); }
 
-async function saveAll() {
+function saveAll() {
   data.schoolName = document.getElementById('e-school-name').value.trim() || 'Staff Launchpad';
   data.banner = document.getElementById('e-banner').value.trim();
-  await saveData(data);
   renderAll();
   closeEdit();
+  saveData(data);
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 initCal();
 loadData().then(() => renderAll());
 
-// Auto-refresh every 5 minutes so all staff see updates without hard reload
-setInterval(() => loadData().then(() => renderAll()), 5 * 60 * 1000);
+// Auto-refresh every 2 minutes so staff see updates without hard reload
+setInterval(() => loadData().then(() => renderAll()), 2 * 60 * 1000);
 </script>
 </body>
 </html>
