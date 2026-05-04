@@ -1,5 +1,25 @@
 {
   "schoolName": "Vinschool Metropolis",
+  "banner": "Hello",
+  "events": [],
+  "deadlines": [],
+  "links": [
+    {
+      "label": "[Misc] School Online",
+      "url": "https://so.vinschool.edu.vn/",
+      "group": "Misc + Data",
+      "icon": "[M"
+    }
+  ],
+  "notices": [
+    {
+      "title": "Congratulations Jon!",
+      "body": "You created a launchpad!",
+      "type": "good"
+    }
+  ]
+}{
+  "schoolName": "Vinschool Metropolis",
   "banner": "",
   "events": [],
   "deadlines": [],
