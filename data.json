@@ -3,6 +3,19 @@
   "banner": "",
   "events": [],
   "deadlines": [],
-  "links": [],
-  "notices": []
+  "links": [
+    {
+      "label": "[Misc] School Online",
+      "url": "https://so.vinschool.edu.vn/",
+      "group": "Misc + Data",
+      "icon": "[M"
+    }
+  ],
+  "notices": [
+    {
+      "title": "Congratulations Jon!",
+      "body": "You created a launchpad!",
+      "type": "good"
+    }
+  ]
 }
