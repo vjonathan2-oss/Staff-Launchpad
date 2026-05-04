@@ -1,0 +1,115 @@
+{
+  "schoolName": "Vinschool Metropolis",
+  "banner": "",
+  "events": [
+    {
+      "date": "2026-05-06",
+      "label": "Bank Holiday — school closed"
+    },
+    {
+      "date": "2026-05-14",
+      "label": "Year 10 Parents Evening"
+    },
+    {
+      "date": "2026-05-22",
+      "label": "Last day before half-term"
+    },
+    {
+      "date": "2026-06-01",
+      "label": "Staff INSET Day"
+    },
+    {
+      "date": "2026-07-17",
+      "label": "Final day of term"
+    }
+  ],
+  "deadlines": [
+    {
+      "name": "Progress reports submitted to HOY",
+      "date": "2026-05-09",
+      "sub": "Via SIMS — see HOY for format guidance"
+    },
+    {
+      "name": "KS4 mock marking returned to students",
+      "date": "2026-05-12",
+      "sub": ""
+    },
+    {
+      "name": "Year 11 predicted grades entered",
+      "date": "2026-05-20",
+      "sub": "SLT will audit on the 21st"
+    },
+    {
+      "name": "Scheme of Work review submitted",
+      "date": "2026-06-13",
+      "sub": "To your Head of Department"
+    }
+  ],
+  "links": [
+    {
+      "label": "SIMS",
+      "url": "https://sims.co.uk",
+      "group": "MIS & Data",
+      "icon": "SI"
+    },
+    {
+      "label": "Arbor",
+      "url": "https://arbor.education",
+      "group": "MIS & Data",
+      "icon": "AR"
+    },
+    {
+      "label": "School email (Outlook)",
+      "url": "https://outlook.office.com",
+      "group": "Communication",
+      "icon": "OL"
+    },
+    {
+      "label": "Microsoft Teams",
+      "url": "https://teams.microsoft.com",
+      "group": "Communication",
+      "icon": "MS"
+    },
+    {
+      "label": "CPD Tracker",
+      "url": "#",
+      "group": "Professional Development",
+      "icon": "CP"
+    },
+    {
+      "label": "Staff handbook (SharePoint)",
+      "url": "#",
+      "group": "Professional Development",
+      "icon": "SH"
+    },
+    {
+      "label": "Lesson Observation Form",
+      "url": "#",
+      "group": "Forms & Admin",
+      "icon": "LO"
+    },
+    {
+      "label": "Cover request form",
+      "url": "#",
+      "group": "Forms & Admin",
+      "icon": "CR"
+    }
+  ],
+  "notices": [
+    {
+      "type": "info",
+      "title": "Exam season reminder",
+      "body": "Please ensure classrooms near the sports hall are kept quiet during morning sessions from 9–11am throughout May exam period."
+    },
+    {
+      "type": "warn",
+      "title": "Car park resurfacing",
+      "body": "The main car park is closed 12–14 May. Please use the overflow field. Allow extra time in the morning."
+    },
+    {
+      "type": "good",
+      "title": "Congratulations Year 11!",
+      "body": "Mock results show a 6% improvement in grades 4+ across all core subjects. Brilliant effort from all involved."
+    }
+  ]
+}
