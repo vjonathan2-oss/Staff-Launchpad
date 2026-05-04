@@ -926,95 +926,50 @@ async function loadData() {
   }
 }
 
-// ── GITHUB API SAVE ───────────────────────────────────────────────────────────
-const GITHUB_TOKEN = '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';
-const GITHUB_REPO  = 'vjonathan2-oss/Staff-Launchpad';
-const GITHUB_FILE  = 'data.json';
-const GITHUB_API   = `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_FILE}`;
+// ── SAVE TO GITHUB ────────────────────────────────────────────────────────────
+// Copies data.json to clipboard and opens GitHub's editor in a new tab.
+// Just paste (Ctrl+V) and click Commit changes — two clicks total.
 
-async function saveData(d) {
-  showLoadingOverlay('Saving changes to GitHub...');
-  try {
-    const json = JSON.stringify(d, null, 2);
-    const encoded = btoa(unescape(encodeURIComponent(json)));
+function saveData(d) {
+  const json = JSON.stringify(d, null, 2);
 
-    // Get current file SHA (needed for updates)
-    let sha = null;
-    try {
-      const getRes = await fetch(GITHUB_API, {
-        headers: {
-          'Authorization': `token ${GITHUB_TOKEN}`,
-          'Accept': 'application/vnd.github.v3+json'
-        }
-      });
-      if (getRes.ok) {
-        const getJson = await getRes.json();
-        sha = getJson.sha;
-      }
-    } catch(e) {}
+  // Copy to clipboard silently
+  navigator.clipboard.writeText(json).catch(() => {});
 
-    // Create or update file
-    const body = {
-      message: 'Launchpad update via editor',
-      content: encoded,
-    };
-    if (sha) body.sha = sha;
-
-    const putRes = await fetch(GITHUB_API, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `token ${GITHUB_TOKEN}`,
-        'Accept': 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
-    });
-
-    if (putRes.ok) {
-      showSaveSuccess();
-    } else {
-      const err = await putRes.json();
-      showSaveError(err.message || 'Unknown error');
-    }
-  } catch(e) {
-    showSaveError(e.message);
-  } finally {
-    hideLoadingOverlay();
-  }
-}
-
-function showSaveSuccess() {
-  let panel = document.getElementById('save-result-overlay');
+  // Show the panel
+  let panel = document.getElementById('save-panel-overlay');
   if (!panel) {
     panel = document.createElement('div');
-    panel.id = 'save-result-overlay';
-    panel.style.cssText = 'position:fixed;inset:0;background:rgba(26,39,68,0.5);z-index:999;display:flex;align-items:center;justify-content:center;padding:2rem;';
+    panel.id = 'save-panel-overlay';
+    panel.style.cssText = 'position:fixed;inset:0;background:rgba(26,39,68,0.55);z-index:999;display:flex;align-items:center;justify-content:center;padding:2rem;';
     document.body.appendChild(panel);
   }
   panel.innerHTML = `
-    <div style="background:white;border-radius:16px;width:100%;max-width:400px;padding:2rem;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.25);">
-      <div style="font-size:2.5rem;margin-bottom:0.75rem;">✅</div>
-      <div style="font-family:Fraunces,serif;font-size:1.15rem;font-weight:500;color:#1a2744;margin-bottom:0.5rem;">Changes saved!</div>
-      <p style="font-size:0.83rem;color:#4a5568;line-height:1.6;margin-bottom:1.25rem;">The launchpad will update for all staff within about 60 seconds.</p>
-      <button onclick="document.getElementById('save-result-overlay').remove()" style="background:#1a2744;color:white;border:none;padding:0.6rem 1.5rem;border-radius:8px;font-family:DM Sans,sans-serif;font-size:0.85rem;font-weight:500;cursor:pointer;">Done</button>
-    </div>`;
-  panel.style.display = 'flex';
-}
-
-function showSaveError(msg) {
-  let panel = document.getElementById('save-result-overlay');
-  if (!panel) {
-    panel = document.createElement('div');
-    panel.id = 'save-result-overlay';
-    panel.style.cssText = 'position:fixed;inset:0;background:rgba(26,39,68,0.5);z-index:999;display:flex;align-items:center;justify-content:center;padding:2rem;';
-    document.body.appendChild(panel);
-  }
-  panel.innerHTML = `
-    <div style="background:white;border-radius:16px;width:100%;max-width:400px;padding:2rem;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.25);">
-      <div style="font-size:2.5rem;margin-bottom:0.75rem;">❌</div>
-      <div style="font-family:Fraunces,serif;font-size:1.15rem;font-weight:500;color:#1a2744;margin-bottom:0.5rem;">Save failed</div>
-      <p style="font-size:0.83rem;color:#4a5568;line-height:1.6;margin-bottom:1.25rem;">${msg}</p>
-      <button onclick="document.getElementById('save-result-overlay').remove()" style="background:#c0392b;color:white;border:none;padding:0.6rem 1.5rem;border-radius:8px;font-family:DM Sans,sans-serif;font-size:0.85rem;font-weight:500;cursor:pointer;">Close</button>
+    <div style="background:white;border-radius:16px;width:100%;max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,0.25);overflow:hidden;">
+      <div style="background:#1a2744;padding:1.25rem 1.5rem;display:flex;align-items:center;gap:0.75rem;">
+        <span style="font-size:1.5rem;">💾</span>
+        <span style="font-family:Fraunces,serif;font-size:1.1rem;font-weight:500;color:white;">Save changes</span>
+      </div>
+      <div style="padding:1.5rem;">
+        <div style="background:#f0faf5;border:1px solid #27ae60;border-radius:8px;padding:0.75rem 1rem;margin-bottom:1.25rem;font-size:0.83rem;color:#1a4a32;">
+          ✅ Content copied to clipboard automatically
+        </div>
+        <p style="font-size:0.85rem;color:#4a5568;line-height:1.7;margin-bottom:1.25rem;">
+          <strong style="color:#1a2744;">Two steps to go live:</strong><br>
+          1. Click <strong>Open GitHub editor</strong> below<br>
+          2. Press <strong>Ctrl+V</strong> to paste, then click <strong>Commit changes</strong>
+        </p>
+        <a href="https://github.com/vjonathan2-oss/Staff-Launchpad/edit/main/data.json" target="_blank"
+           onclick="setTimeout(()=>document.getElementById('save-panel-overlay').remove(), 500)"
+           style="display:block;background:#e8b84b;color:#1a2744;text-align:center;padding:0.7rem 1.25rem;border-radius:8px;font-family:DM Sans,sans-serif;font-size:0.88rem;font-weight:500;text-decoration:none;margin-bottom:0.6rem;">
+          Open GitHub editor &#8599;
+        </a>
+        <button onclick="document.getElementById('save-panel-overlay').remove()"
+          style="width:100%;background:none;border:1px solid #e2ddd6;padding:0.6rem;border-radius:8px;font-family:DM Sans,sans-serif;font-size:0.83rem;color:#718096;cursor:pointer;">
+          Cancel
+        </button>
+        <p style="font-size:0.72rem;color:#aaa;margin-top:0.75rem;text-align:center;">Staff will see changes within ~60 seconds of committing.</p>
+      </div>
     </div>`;
   panel.style.display = 'flex';
 }
@@ -1363,12 +1318,12 @@ function addNotice() {
 
 function removeNotice(i) { data.notices.splice(i,1); renderEditLists(); }
 
-async function saveAll() {
+function saveAll() {
   data.schoolName = document.getElementById('e-school-name').value.trim() || 'Staff Launchpad';
   data.banner = document.getElementById('e-banner').value.trim();
   renderAll();
   closeEdit();
-  await saveData(data);
+  saveData(data);
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
